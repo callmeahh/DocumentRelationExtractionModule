@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<script src="http://code.jquery.com/jquery-1.4.1.min.js"></script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>koa4neo4j</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+<body>
+  hello world
+
+  <h1>sample</h1>
+  <div id="fish-price">
+  </div>
+  <div id="t">
+  </div>
+    <div id="s">
+  </div>
+  
+  
+   <div class="container">
+    <div class="row">
+      <table style="width: 600px;height: 200px;" id="tableid" class="table table-bordered">
+        <thead>
+          <tr>
+            <td>用户名</td>
+            <td>年龄</td>
+            <td>手机号</td>
+          </tr>
+        </thead>
+     </table>
+     <button id="bt" onclick="getLoad();">加载数据</button>
+    </div>
+  </div>
+
+ <input id="search-word" type="text" οnkeydοwn="jump(event);" placeholder="">
+    <button class="btn btn-search" id="click-search" type="button" value="start"
+            onclick="jump()">搜&nbsp;&nbsp;&nbsp;&nbsp索
+    </button>
+    
+    
+</body>
+</html>
+
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+<script>
+
+$(document).ready(function(){
+    var price_info;
+    axios.get('http://localhost:3000/neo4j?query=Aaron%20Sorkin')
+    .then(function (response) {
+        price_info=response.data.data[0].keys;
+        t=response.data.data[0]._fields[0].end.properties.tagline;
+        s=response.data.data[0]._fields[0].end.properties.title;
+        document.getElementById('fish-price').innerHTML = "<p>价格：" + price_info + "铃钱</p>"
+        document.getElementById('t').innerHTML = "<p>价格：" + s + "铃钱</p>"
+        $('#s')[0].innerHTML = "<p>价格：" + s + "铃钱</p>"
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
+});
+
+ //axios异步加载数据
+ function getLoad(){
+ //这里的json文件地址是自己的
+  axios.get('http://localhost:3000/neo4j?query=Aaron%20Sorkin',{}).then(function(response){
+     var attr=response.data.data;
+    $.each(attr,function(index,value){
+     //在页面显示数据
+     $("#tableid").append("<tr><td>" +attr[index]._fields[0].segments[0].start.properties.name+"</td>"+
+                               "<td>" + attr[index]._fields[0].segments[0].relationship.type+"</td>"+
+                               "<td>"+attr[index]._fields[0].segments[0].end.properties.title+"</td></tr>");
+    })
+    });
+    $("#bt").attr("disabled", true);//按钮设置为失效
+ };
+
+function jump(){
+    var search_keyword=document.getElementById("search-word").value;
+    axios.get('http://localhost:3000/neo4j', {
+	    params :{
+		query: search_keyword
+	    }
+    })
+    .then(function(response){
+     var attr=response.data.data;
+    $.each(attr,function(index,value){
+     //在页面显示数据
+     $("#tableid").append("<tr><td>" +attr[index]._fields[0].segments[0].start.properties.name+"</td>"+
+                               "<td>" + attr[index]._fields[0].segments[0].relationship.type+"</td>"+
+                               "<td>"+attr[index]._fields[0].segments[0].end.properties.title+"</td></tr>");
+    })
+    });
+    $("#tableid").empty()
+ };
+
+</script>
+
+
+  

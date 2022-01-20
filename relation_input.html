@@ -1,0 +1,175 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>Elements - Editorial by HTML5 UP</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+</head>
+
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Main -->
+		<div id="main">
+			<div class="inner">
+
+				<!-- Header -->
+				<header id="header">
+					<a href="index.html" class="logo">故障诊断知识图谱中<strong>关系提取模块</strong></a>
+					<ul class="icons">
+						<li><a href="index.html" class="icon solid fa-home"><span class="label">主页</span></a></li>
+						<li><a href="search.html" class="icon solid fa-search"><span class="label">关系检索</span></a></li>
+						<li><a href="relation_input.html" class="icon solid fa-grip-lines"><span
+									class="label">关系插入</span></a></li>
+						<li><a href="sentence_input.html" class="icon solid fa-sticky-note"><span
+									class="label">句子关系提取</span></a></li>
+						<li><a href="document_input.html" class="icon solid fa-book-open"><span
+									class="label">文档关系提取</span></a></li>
+					</ul>
+				</header>
+
+				<!-- Content -->
+				<section>
+					<header class="main">
+						<h1>关系插入</h1>
+					</header>
+
+					<form method="post" action="#">
+						<div class="row gtr-uniform">
+							<div class="col-4 col-12-xsmall">
+								<input type="text" name="Entity1" id="Entity1" value="" placeholder="实体1" />
+							</div>
+							<div class="col-4 col-12-xsmall">
+								<input type="text" name="Relation" id="Relation" value="" placeholder="关系" />
+							</div>
+							<div class="col-4 col-12-xsmall">
+								<input type="text" name="Entity2" id="Entity2" value="" placeholder="实体2" />
+							</div>
+							<div class="col-4 col-12-small">
+								<input type="radio" id="demo-priority-low" name="demo-priority" value=1 checked>
+								<label for="demo-priority-low">仅按实体顺序插入</label>
+							</div>
+							<div class="col-4 col-12-small">
+								<input type="radio" id="demo-priority-normal" name="demo-priority" value=2>
+								<label for="demo-priority-normal">同时交换实体顺序插入</label>
+							</div>
+
+						</div>
+					</form>
+					<div class="row gtr-uniform">
+						<div class="col-10 col-12-xsmall">
+						</div>
+
+						<div class="col-2 col-12-xsmall">
+							<ul class="actions">
+								<li><a class="button primary" onclick="insertTrplet();">插入</a></li>
+							</ul>
+						</div>
+					</div>
+
+				</section>
+
+			</div>
+		</div>
+
+		<!-- Sidebar -->
+		<div id="sidebar">
+			<div class="inner">
+				<section class="">
+					<span class="image fit"><img src="images/node_network.jpeg" alt="" /></span>
+				</section>
+				<!-- Menu -->
+				<nav id="menu">
+					<header class="major">
+						<h2>菜单</h2>
+					</header>
+					<ul>
+						<li><a href="index.html">主页</a></li>
+						<li><a href="search.html">关系检索</a></li>
+						<li>
+							<span class="opener">关系提取</span>
+							<ul>
+								<li><a href="relation_input.html">关系输入</a></li>
+								<li><a href="sentence_input.html">句子输入</a></li>
+								<li><a href="document_input.html">文档输入</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				<!-- Footer -->
+				<footer id="footer">
+					<p class="copyright">故障诊断知识图谱中文档级关系提取模块的设计与实现</p>
+				</footer>
+
+			</div>
+		</div>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="https://cdn.bootcss.com/qs/6.5.1/qs.min.js"></script>
+
+	<script>
+		// const Qs = require('qs');
+		function insertTrplet() {
+			var t = $("input[type='radio']:checked").val();
+			console.log("----", t);
+			var e1 = document.getElementById("Entity1").value;
+			var r = document.getElementById("Relation").value;
+			var e2 = document.getElementById("Entity2").value;
+			if (e1 == '' && r == '' && e2 == '') {
+				console.log("不能全为空！")
+				return;
+			} else {
+				let p = {
+					entity1: e1,
+					relation: r,
+					entity2: e2
+				};
+				p = Qs.stringify(p);
+
+				console.log("--------------------insertTrplet-----------------------");
+
+				axios.post('http://localhost:3000/insert', { data: p })
+					.then(function (response) {
+						console.log(response.data);
+						console.log("--insertFinish--");
+					})
+				if (t == 2) {
+					let q = {
+						entity1: e2,
+						relation: r,
+						entity2: e1
+					};
+					q = Qs.stringify(q)
+					console.log("--------------------insertTrplet_symmetric-----------------------");
+
+					axios.post('http://localhost:3000/insert', { data: q })
+						.then(function (response) {
+							console.log(response.data);
+							console.log("--insertFinish_symmetric--");
+						})
+				}
+			}
+		};
+
+	</script>
+
+</body>
+
+</html>

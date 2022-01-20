@@ -1,0 +1,284 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+
+<head>
+	<title>故障诊断知识图谱中文档级关系提取模块的设计与实现</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+</head>
+
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Main -->
+		<div id="main">
+			<div class="inner">
+				<!-- Header -->
+				<header id="header">
+					<a href="index.html" class="logo">故障诊断知识图谱中<strong>关系提取模块</strong></a>
+					<ul class="icons">
+						<li><a href="index.html" class="icon solid fa-home"><span class="label">主页</span></a></li>
+						<li><a href="search.html" class="icon solid fa-search"><span class="label">关系检索</span></a></li>
+						<li><a href="relation_input.html" class="icon solid fa-grip-lines"><span
+									class="label">关系插入</span></a></li>
+						<li><a href="sentence_input.html" class="icon solid fa-sticky-note"><span
+									class="label">句子关系提取</span></a></li>
+						<li><a href="document_input.html" class="icon solid fa-book-open"><span
+									class="label">文档关系提取</span></a></li>
+					</ul>
+				</header>
+				<section>
+
+					<header class="major">
+						<h1>关系检索</h1>
+					</header>
+
+					<!-- Search -->
+					<div class="row">
+						<div class="col-2 col-12-small">
+							<select name="demo-category" id="demo-category">
+								<option value="">- 类型 -</option>
+								<option value="1">实体</option>
+								<option value="2">关系</option>
+							</select>
+						</div>
+						<div class="col-8 col-12-small">
+							<section id="search" class="alt">
+								<input type="text" name="query" id="search-word" placeholder="输入想查找的关键词" />
+							</section>
+						</div>
+						<div class="col-2 col-12-small">
+							<button type="submit" id="searchbutton" onclick="jump();">查找</button>
+						</div>
+					</div>
+
+					<hr />
+					<h4>查询结果</h4>
+					<div class="table-wrapper">
+						<table class="alt" id="tableid">
+							<thead>
+								<tr>
+									<th>实体</th>
+									<th>关系</th>
+									<th>实体</th>
+								</tr>
+							</thead>
+							<tbody id="tableBody">
+							</tbody>
+						</table>
+					</div>
+					<!-- <div class="col-10 col-12-small">
+							<h4>Pagination</h4>
+													<ul class="pagination">
+														<li><span class="button disabled">Prev</span></li>
+														<li><a href="#" class="page active">1</a></li>
+														<li><a href="#" class="page">2</a></li>
+														<li><a href="#" class="page">3</a></li>
+														<li><span>&hellip;</span></li>
+														<li><a href="#" class="page">8</a></li>
+														<li><a href="#" class="page">9</a></li>
+														<li><a href="#" class="page">10</a></li>
+														<li><a href="#" class="button">Next</a></li>
+													</ul>
+							</div> -->
+					<div class="row gtr-uniform">
+						<div class="col-10 col-12-xsmall">
+						</div>
+
+						<div class="col-2 col-12-xsmall">
+							<ul class="actions">
+								<li><a class="button primary" onclick="downloadF();">下载</a></li>
+							</ul>
+						</div>
+					</div>
+
+				</section>
+
+
+			</div>
+		</div>
+
+		<!-- Sidebar -->
+		<div id="sidebar">
+			<div class="inner">
+				<section class="">
+					<span class="image fit"><img src="images/node_network.jpeg" alt="" /></span>
+				</section>
+				<!-- Menu -->
+				<nav id="menu">
+					<header class="major">
+						<h2>菜单</h2>
+					</header>
+					<ul>
+						<li><a href="index.html">主页</a></li>
+						<li><a href="search.html">关系检索</a></li>
+						<li>
+							<span class="opener">关系提取</span>
+							<ul>
+								<li><a href="relation_input.html">关系输入</a></li>
+								<li><a href="sentence_input.html">句子输入</a></li>
+								<li><a href="document_input.html">文档输入</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				<!-- Footer -->
+				<footer id="footer">
+					<p class="copyright">故障诊断知识图谱中文档级关系提取模块的设计与实现</p>
+				</footer>
+
+			</div>
+		</div>
+	</div>
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script>
+		var downloadFile = "实体,关系,实体\n";
+		function init(downloadFile) {
+			console.log("init!!!")
+			this.downloadFile = "实体,关系,实体\n";
+		};
+		//axios异步加载数据
+		function getLoad() {
+			//这里的json文件地址是自己的
+			axios.get('http://localhost:3000/neo4j?query=Aaron%20Sorkin', {}).then(function (response) {
+				var attr = response.data.data;
+				$.each(attr, function (index, value) {
+					//在页面显示数据
+					$("#tableid").append("<tr><td>" + attr[index]._fields[0].segments[0].start.properties.name + "</td>" +
+						"<td>" + attr[index]._fields[0].segments[0].relationship.type + "</td>" +
+						"<td>" + attr[index]._fields[0].segments[0].end.properties.title + "</td></tr>");
+				})
+			});
+			$("#bt").attr("disabled", true);//按钮设置为失效
+		};
+
+		// $('#search').bind('keypress', function (event) { 
+		// if (event.keyCode == "13") { 
+		// $("#searchbutton").click();
+		// }
+		// });
+		function jump() {
+			var type = document.getElementById("demo-category").value;
+			console.log("-------------------------------------------", type)
+			var search_keyword = document.getElementById("search-word").value;
+			if (type == 1) {
+				axios.get('http://localhost:3000/person', {
+					params: {
+						name: search_keyword
+					}
+				})
+					.then(function (response) {
+						var attr = response.data.data;
+						$.each(attr, function (index, value) {
+							//在页面显示数据
+							$("#tableBody").append("<tr><td>" + attr[index]._fields[0].segments[0].start.properties.name + "</td>" +
+								"<td>" + attr[index]._fields[0].segments[0].relationship.type + "</td>" +
+								"<td>" + attr[index]._fields[0].segments[0].end.properties.title + "</td></tr>");
+							downloadFile += attr[index]._fields[0].segments[0].start.properties.name + "," +
+								attr[index]._fields[0].segments[0].relationship.type + "," +
+								attr[index]._fields[0].segments[0].end.properties.title +"\n";
+						})
+					});
+				$("#tableBody").empty();
+				init(downloadFile);
+			}
+			else if (type == 2) {
+				axios.get('http://localhost:3000/movie', {
+					params: {
+						name: search_keyword
+					}
+				})
+					.then(function (response) {
+						var attr = response.data.data;
+						$.each(attr, function (index, value) {
+							//在页面显示数据
+							$("#tableBody").append("<tr><td>" + attr[index]._fields[0].segments[0].start.properties.name + "</td>" +
+								"<td>" + attr[index]._fields[0].segments[0].relationship.type + "</td>" +
+								"<td>" + attr[index]._fields[0].segments[0].end.properties.title + "</td></tr>");
+						})
+					});
+				$("#tableBody").empty()
+			} else {
+				axios.get('http://localhost:3000/person', {
+					params: {
+						name: search_keyword
+					}
+				})
+					.then(function (response) {
+						var attr = response.data.data;
+						$.each(attr, function (index, value) {
+							//在页面显示数据
+							$("#tableBody").append("<tr><td>" + attr[index]._fields[0].segments[0].start.properties.name + "</td>" +
+								"<td>" + attr[index]._fields[0].segments[0].relationship.type + "</td>" +
+								"<td>" + attr[index]._fields[0].segments[0].end.properties.title + "</td></tr>");
+						})
+					});
+				axios.get('http://localhost:3000/movie', {
+					params: {
+						name: search_keyword
+					}
+				})
+					.then(function (response) {
+						var attr = response.data.data;
+						$.each(attr, function (index, value) {
+							//在页面显示数据
+							$("#tableBody").append("<tr><td>" + attr[index]._fields[0].segments[0].start.properties.name + "</td>" +
+								"<td>" + attr[index]._fields[0].segments[0].relationship.type + "</td>" +
+								"<td>" + attr[index]._fields[0].segments[0].end.properties.title + "</td></tr>");
+						})
+					});
+				$("#tableBody").empty()
+			}
+		};
+		function downloadF(){
+			console.log("--------------------Downloading----------------------------------");
+			// try {
+
+				
+			// 	let url = window.URL.createObjectURL(downloadFile);
+			// 	let eleLink = document.createElement('a');
+			// 	eleLink.href = url;
+			// 	eleLink.download = `relation`+new Date()+`.csv`;
+			// 	document.body.appendChild(eleLink);
+			// 	eleLink.click();
+			// 	window.URL.revokeObjectURL(url);
+			// } catch (error) {
+			// 	console.error('download function error!', error);
+			// }
+			downloadByBlob(downloadFile,"csv","relation"+new Date().getTime());
+		};
+		function downloadByBlob(data, fileType, fileName) {
+			try {
+				let binaryData = [];
+				let eleLink = document.createElement('a');
+                binaryData.push(data);
+				let url = window.URL.createObjectURL(new Blob(binaryData));
+                eleLink.href = url;
+				// eleLink.href = url;
+				eleLink.download = `${fileName}.${fileType}`;
+				document.body.appendChild(eleLink);
+				eleLink.click();
+				window.URL.revokeObjectURL(url);
+			} catch (error) {
+				console.error('download function error!', error);
+			}
+		};
+	</script>
+
+</body>
+
+</html>
